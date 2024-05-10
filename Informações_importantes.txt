@@ -1,0 +1,13 @@
+O formato do projeto foi escolhido para melhor atender às necessidades técnicas e funcionais do mesmo. O uso do Tkinter para a interface gráfica proporcionou uma experiência de usuário mais rica e interativa, o que não seria possível com o Google Colab, que não suporta essa biblioteca.
+
+Além disso, devido ao tamanho substancial do projeto, excedendo o limite de upload do GitHub, optamos por hospedá-lo no Google Drive. Isso permite que o projeto seja acessado e baixado facilmente, sem comprometer a integridade ou a funcionalidade do código.
+
+O código do projeto está disponível em um arquivo .txt separado para facilitar a visualização e revisão do código sem a necessidade de baixar todo o projeto. Isso também permite que outros desenvolvedores possam aprender com o código e até mesmo contribuir para o projeto.
+
+Espero que essas decisões proporcionem a melhor experiência possível para todos que interagem com nosso projeto. Agradecemos sua compreensão e apoio.
+
+E por último justifico todas as minhas decisões com o fato de que meu primeiro contato com programação foi nesse curso.
+
+
+
+Link: https://drive.google.com/file/d/19U3GFomDrIeZr_TKfM-NQcDn_5CHdt3w/view?usp=sharing
