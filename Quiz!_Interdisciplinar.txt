@@ -1,0 +1,107 @@
+import os
+import tkinter as tk
+import google.generativeai as genai
+
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+genai.configure(api_key=GOOGLE_API_KEY)
+
+generation_config = {
+'candidate_count': 1,
+'temperature': 0.3,
+}
+
+safety_settings = {
+'HARASSMENT': 'BLOCK_NONE',
+'HATE': 'BLOCK_NONE',
+'SEXUAL': 'BLOCK_NONE',
+'DANGEROUS': 'BLOCK_NONE',
+}
+
+model = genai.GenerativeModel(model_name='gemini-1.0-pro',
+                              generation_config=generation_config,
+                              safety_settings=safety_settings)
+
+chat = model.start_chat(history=[])
+
+def executar_codigo():
+    prompt = entry.get()
+    if not prompt.strip():  # Verifica se o campo de entrada está vazio
+        resultado.set('Campo vazio, por favor digite algum assunto, tema ou área de conhecimento')
+        return  # Retorna da função se o campo de entrada estiver vazio
+
+    label.place_forget()  # Remove o rótulo
+    entry.place_forget()  # Remove o campo de entrada
+    for botao in botoes.values():  # Remove os botões antigos
+        botao.place_forget()
+    botoes.clear()
+
+    texto_adicional = " Tema: História. Pergunta: Em que ano iniciou a primeira guerra mundial?. Alternativas: 1=1910 2=1915 3=1913 4=1914. Resposta: 4=1914. Tema2: " + prompt + ". Pergunta2: ?. Alternativas2: 1=? 2=? 3=? 4=?. Resposta2: ? (OBS: Tem que ser uma pergunta diferente das enteriores)."
+    response = chat.send_message(prompt + texto_adicional)
+    partes = response.text.split("Resposta 2:")
+    pergunta_e_alternativas = partes[0].replace('**', '')
+    pergunta_e_alternativas = pergunta_e_alternativas.replace('Tema 2:', 'Tema:').replace('Pergunta 2:', 'Pergunta:').replace('Alternativas 2:', 'Alternativas:')
+    resultado.set(pergunta_e_alternativas)
+    if len(partes) > 1:
+        resposta_correta.set(partes[1].strip().split('\n')[0])
+    else:
+        resposta_correta.set(None)
+
+    for i, alternativa in enumerate(["1", "2", "3", "4"]):  # Adicionado "4" à lista de alternativas
+        botao = tk.Button(root, text="Alternativa " + alternativa,
+                          command=lambda alternativa=alternativa: verificar_resposta(alternativa))
+        botao.place(relx=0.5, rely=0.5 + i * 0.1, anchor="center")
+        botoes[alternativa] = botao
+
+    botao_enviar.place_forget()  # Oculta o botão de enviar
+
+def verificar_resposta(alternativa):
+    for botao in botoes.values():  # Oculta todos os botões de alternativas
+        botao.place_forget()
+    if alternativa in resposta_correta.get():
+        botoes[alternativa].config(bg='green')
+        resultado.set('Correto!')
+    else:
+        botoes[alternativa].config(bg='red')
+        resultado.set('Incorreto. A resposta correta era ' + resposta_correta.get())
+    botoes[alternativa].place(relx=0.5, rely=0.5, anchor="center")  # Exibe apenas o botão que o usuário clicou
+    botao_reiniciar.place(relx=0.5, rely=0.9, anchor='center')  # Exibe o botão de reiniciar
+
+def reiniciar():
+    label.place(relx=0.5, rely=0.1, anchor='center')  # Exibe o rótulo
+    entry.place(relx=0.5, rely=0.2, anchor='center')  # Exibe o campo de entrada
+    for botao in botoes.values():  # Remove os botões das alternativas
+        botao.place_forget()
+    botoes.clear()
+
+    botao_enviar.place(relx=0.5, rely=0.3, anchor='center')  # Exibe o botão de enviar
+    botao_reiniciar.place_forget()  # Oculta o botão de reiniciar
+
+    entry.delete(0, 'end')  # Limpa o campo de entrada
+    resultado.set('')  # Limpa o rótulo
+
+root = tk.Tk()
+root.geometry('420x400')  # Define o tamanho da janela
+root.title('Quiz!')  # Define o título da janela
+
+label = tk.Label(root, text='Escolha um assunto, tema ou área de conhecimento\n(ex: Inteligencia Artificial, Universo Marvel, Química, Historia...)', wraplength=200)
+label.place(relx=0.5, rely=0.1, anchor='center')  # Posiciona o rótulo no centro da janela
+
+espaco = tk.Label(root, text='')  # Cria um rótulo vazio para o espaço
+espaco.place(relx=0.5, rely=0.2, anchor='center')  # Posiciona o espaço no centro da janela
+
+entry = tk.Entry(root)
+entry.place(relx=0.5, rely=0.25, anchor='center')  # Posiciona o campo de entrada no centro da janela
+
+resultado = tk.StringVar()
+label_resultado = tk.Label(root, textvariable=resultado)
+label_resultado.place(relx=0.5, rely=0.3, anchor='center')  # Posiciona o rótulo de resultado no centro da janela
+
+botao_enviar = tk.Button(root, text="Escolher tema", command=executar_codigo)
+botao_enviar.place(relx=0.5, rely=0.35, anchor='center')  # Posiciona o botão de enviar no centro da janela
+
+botao_reiniciar = tk.Button(root, text="Reiniciar", command=reiniciar)
+
+resposta_correta = tk.StringVar()
+botoes = {}
+
+root.mainloop()
